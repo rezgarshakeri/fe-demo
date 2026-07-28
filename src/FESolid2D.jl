@@ -4,12 +4,15 @@ using LinearAlgebra
 using SparseArrays
 using Random
 using FastGaussQuadrature
+using Enzyme
+using StaticArrays
 
 include("basis.jl")
 include("mesh.jl")
 include("bcs.jl")
 include("elasticity.jl")
 include("neohookean.jl")
+include("plasticity.jl")
 
 export vander_legendre_deriv, febasis1D, febasis2D, FEBasis
 
@@ -25,5 +28,9 @@ export Compute_f0, Compute_f1, Compute_df1,
 
 export bulk_modulus, NeoHookeanState, neo_hookean_dS,
     Compute_f1_NeoHookean, HyperelasticResidual, HyperelasticJacobian, HyperelasticResidualNeumann
+
+export PlasticityParams, PlasticityState, VirginPlasticityState, Eig2x2Sym, ReturnMappingDeltaGamma,
+    PlasticityLocal, PlasticityStressOnly, PlasticityResidual, PlasticityResidualNeumann,
+    PlasticityJacobian, AdvancePlasticityState
 
 end # module FESolid2D

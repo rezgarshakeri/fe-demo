@@ -44,3 +44,5 @@ function sigma_exact(lambda, mu, x, y)
     s12 = @. mu * (ux_y + uy_x)
     return s11, s12
 end
+
+f_zero(lambda, mu, x, y) = zeros(2 * length(x)) # zero body force, shared by hyperelasticity/plasticity tests

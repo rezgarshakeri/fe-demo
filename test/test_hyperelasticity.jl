@@ -9,8 +9,6 @@ function make_hyperelastic_problem(P, nx, ny)
     return Bx, Bu, xc, yc, Ind
 end
 
-f_zero(lambda, mu, x, y) = zeros(2 * length(x))
-
 @testset "Jacobian matches residual (finite differences)" begin
     # No BCs: exercises the raw nonlinear operator, independent of BC bookkeeping
     # (already validated separately for the linear elasticity case).

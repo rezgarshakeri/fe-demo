@@ -18,4 +18,7 @@ Random.seed!(42)
         # relies on uex/f from mms_fixtures.jl, already loaded above
         include("test_hyperelasticity.jl")
     end
+    @testset verbose = true "Plasticity" begin
+        include("test_plasticity.jl")
+    end
 end
