@@ -166,6 +166,19 @@ function HyperelasticResidual(lambda, mu, u_in, xc, yc, Ind::FEIndices, Bx::FEBa
 end
 
 """
+    HyperelasticResidualNeumann(lambda, mu, u_in, xc, yc, Ind, Bx, Bu, f, bc_idx, u_bc, Ft)
+
+[`HyperelasticResidual`](@ref) with an additional (constant, precomputed)
+traction load vector `Ft` from `GetTractionGlobal` subtracted in.
+"""
+function HyperelasticResidualNeumann(lambda, mu, u_in, xc, yc, Ind::FEIndices, Bx::FEBasis, Bu::FEBasis, f, bc_idx, u_bc, Ft)
+    v = HyperelasticResidual(lambda, mu, u_in, xc, yc, Ind, Bx, Bu, f, bc_idx, u_bc)
+    v .-= vec(Ft)
+    v[bc_idx] = u_in[bc_idx] - u_bc
+    return v
+end
+
+"""
     HyperelasticJacobian(lambda, mu, u_in, xc, yc, Ind, Bx, Bu, bc_idx)
 
 Tangent stiffness for 2D isochoric Neo-Hookean hyperelasticity, linearized

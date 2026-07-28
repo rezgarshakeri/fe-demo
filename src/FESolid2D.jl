@@ -24,6 +24,6 @@ export Compute_f0, Compute_f1, Compute_df1,
     GetL2Error, GetL2ErrorDisc
 
 export bulk_modulus, NeoHookeanState, neo_hookean_dS,
-    Compute_f1_NeoHookean, HyperelasticResidual, HyperelasticJacobian
+    Compute_f1_NeoHookean, HyperelasticResidual, HyperelasticJacobian, HyperelasticResidualNeumann
 
 end # module FESolid2D

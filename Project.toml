@@ -1,7 +1,7 @@
 name = "FESolid2D"
 uuid = "02384cbc-000c-4bc6-96b3-34ef0d2b50bf"
-authors = ["Rezgar Shakeri <rezgar@umich.edu>"]
 version = "0.1.0"
+authors = ["Rezgar Shakeri <rezgar@umich.edu>"]
 
 [deps]
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"

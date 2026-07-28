@@ -5,10 +5,11 @@ Global dof indices with a Dirichlet BC on the given `sides` of a structured
 mesh (any subset of `:bottom`, `:right`, `:top`, `:left`) — the remaining
 sides are left free for a natural (e.g. traction) BC.
 
-To avoid double-counting shared corners, `:bottom`/`:top` contribute their
-full node range and `:left`/`:right` contribute only their interior nodes —
-so at least one of `:bottom`/`:top` must be included whenever `:left`/`:right`
-is.
+Each side contributes its own full node range, including its two corners, so
+any single side (e.g. just `:left`) is fully and correctly clamped on its
+own. A corner shared by two requested sides is harmlessly listed twice (both
+the x- and y-component blocks get the same duplicate, so the pairing used to
+build `x_bc = reshape(x[bc_idx], :, 2)` elsewhere stays consistent).
 """
 function GetDirichletBCsIndex(num_comp, Ind::FEIndices, sides=(:bottom, :right, :top, :left))
     num_nodes = Ind.nodes_u[1] * Ind.nodes_u[2]
@@ -25,12 +26,12 @@ function GetDirichletBCsIndex(num_comp, Ind::FEIndices, sides=(:bottom, :right, 
             end
         end
         if :right in sides
-            for j = 2:Ind.nodes_u[2]-1
+            for j = 1:Ind.nodes_u[2]
                 append!(bc_idx, Ind.idx_r[j] .+ c * num_nodes)
             end
         end
         if :left in sides
-            for j = 2:Ind.nodes_u[2]-1
+            for j = 1:Ind.nodes_u[2]
                 append!(bc_idx, Ind.idx_l[j] .+ c * num_nodes)
             end
         end
