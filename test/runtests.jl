@@ -21,4 +21,8 @@ Random.seed!(42)
     @testset verbose = true "Plasticity" begin
         include("test_plasticity.jl")
     end
+    @testset verbose = true "Contact" begin
+        # relies on f_zero from mms_fixtures.jl, already loaded above
+        include("test_contact.jl")
+    end
 end
