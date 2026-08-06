@@ -351,14 +351,19 @@ struct FEFaceIndices
 end
 
 """
+    GetFaceQdata(Coord_face, Q, Qmode)
     GetFaceQdata(Coord_face, Bu::FEBasis)
 
 Physical quadrature points and length element (`ds`) along a straight
 element face, given its two corner coordinates `Coord_face = [x1;x2;y1;y2]`
-(mirrors [`GetQdata`](@ref) but for the 1D boundary of a 2D element).
+(mirrors [`GetQdata`](@ref) but for the 1D boundary of a 2D element). The
+`FEBasis` form is a convenience wrapper (`Q`/`Qmode` are the only fields
+used) so existing callers built around `Bu::FEBasis` are unaffected; also
+accepts `Q`/`Qmode` directly so it can be called with an [`FEFaceBasis`](@ref)
+(used by contact) without needing a full volume `FEBasis`.
 """
-function GetFaceQdata(Coord_face, Bu::FEBasis)
-    _, _, w1, B1g, D1g = febasis1D(2, Bu.Q, Bu.Qmode)  # linear (corner) geometry basis
+function GetFaceQdata(Coord_face, Q, Qmode)
+    _, _, w1, B1g, D1g = febasis1D(2, Q, Qmode)  # linear (corner) geometry basis
     xy = reshape(Coord_face, 2, 2)
     dxds = D1g * xy[:, 1]
     dyds = D1g * xy[:, 2]
@@ -366,6 +371,31 @@ function GetFaceQdata(Coord_face, Bu::FEBasis)
     xq = B1g * xy[:, 1]
     yq = B1g * xy[:, 2]
     return xq, yq, wds
+end
+GetFaceQdata(Coord_face, Bu::FEBasis) = GetFaceQdata(Coord_face, Bu.Q, Bu.Qmode)
+
+"""
+    GetQdataFace(Coord_E, FaceBx::FEFaceBasis)
+
+Physical-gradient pullback `dXdx_T = J^{-T}` at the `FaceBx.Q` face
+quadrature points of an element, given ALL FOUR of its corner coordinates
+`Coord_E` (mirrors [`GetQdata`](@ref), restricted to one edge of the
+reference element instead of the full `Q^2` interior grid). `FaceBx` must be
+a geometry face basis (`P=2`, `num_comp=2`, i.e. built the same way `Bx` is
+for the volume case). Needed to evaluate a field's *gradient* (e.g. stress)
+at points on a boundary face -- unlike [`GetFaceQdata`](@ref), which only
+interpolates position/arc-length from the (always-linear) 2 face-corner
+coordinates.
+"""
+function GetQdataFace(Coord_E, FaceBx::FEFaceBasis)
+    J1 = FaceBx.D * Coord_E
+    J2 = reshape(J1, FaceBx.Q, :)
+    dXdx_T = zeros(FaceBx.Q, 2, 2)
+    for i = 1:FaceBx.Q
+        J = reshape(J2[i, :], 2, 2)
+        dXdx_T[i, :, :] = I / J
+    end
+    return dXdx_T
 end
 
 # This is like a libCEED/Ratel Neumann (traction) boundary QFunction: f0_face = v * t
